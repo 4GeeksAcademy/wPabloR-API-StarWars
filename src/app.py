@@ -8,7 +8,8 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Planet, Starship, Character
+from sqlalchemy import select
 #from models import Person
 
 app = Flask(__name__)
@@ -36,11 +37,96 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+
 @app.route('/user', methods=['GET'])
-def handle_hello():
+def get_users():
+
+    all_users = User.query.all()
+    results = list(map(lambda user: user.serialize(), all_users))
 
     response_body = {
-        "msg": "Hello, this is your GET /user response "
+        "users": results
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/planet', methods=['GET'])
+def get_planets():
+
+    all_planets = Planet.query.all()
+    results = list(map(lambda planet: planet.serialize(), all_planets))
+
+    response_body = {
+        "planets": results
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/starship', methods=['GET'])
+def get_starships():
+
+    all_starships = Starship.query.all()
+    results = list(map(lambda ship: ship.serialize(), all_starships))
+
+    response_body = {
+        "starships": results
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/character', methods=['GET'])
+def get_characters():
+
+    all_characters = Character.query.all()
+    results = list(map(lambda ship: ship.serialize(), all_characters))
+
+    response_body = {
+        "characters": results
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/user/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+
+    user = db.session.get(User, user_id)
+
+    response_body = {
+        "user": user.serialize()
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/planet/<int:planet_id>', methods=['GET'])
+def get_planet(planet_id):
+
+    planet = db.session.get(Planet, planet_id)
+
+    response_body = {
+        "planet": planet.serialize()
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/starship/<int:starship_id>', methods=['GET'])
+def get_starship(starship_id):
+
+    starship = db.session.get(Starship, starship_id)
+
+    response_body = {
+        "starship": starship.serialize()
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/character/<int:character_id>', methods=['GET'])
+def get_character(character_id):
+
+    character = db.session.get(Character, character_id)
+   
+
+    response_body = {
+        "characters": character.serialize()
     }
 
     return jsonify(response_body), 200
