@@ -30,6 +30,11 @@ class User(db.Model):
             "name": self.name,
             "last_name": self.last_name
         }
+    
+    def __str__(self):
+        return self.name
+    
+    
 
 class Planet(db.Model):
     __tablename__ = 'planets'
@@ -53,6 +58,9 @@ class Planet(db.Model):
             "appears_in_episodes": self.appears_in_episodes,
             "diameter": self.diameter
         }
+        
+    def __str__(self):
+        return self.name
 
 class Starship(db.Model):
     __tablename__ = 'starships'
@@ -76,6 +84,9 @@ class Starship(db.Model):
             "passengers": self.passengers,
             "length": self.length
         }
+        
+    def __str__(self):
+        return self.name
 
 class Character(db.Model):
     __tablename__ = 'characters'
@@ -99,6 +110,9 @@ class Character(db.Model):
             "appears_in": self.appears_in,
             "usual_starship": self.usual_starship
         }
+    
+    def __str__(self):
+        return self.name
 
 class FavoritePlanet(db.Model):
     __tablename__ = 'favorite_planets'
@@ -121,6 +135,7 @@ class FavoritePlanet(db.Model):
             "planet": self.planet.serialize()
         }
 
+
 class FavoriteCharacter(db.Model):
     __tablename__ = 'favorite_characters'
     
@@ -141,6 +156,7 @@ class FavoriteCharacter(db.Model):
             "added_on": self.added_on.isoformat(),
             "character": self.character.serialize()
         }
+    
 
 class FavoriteStarship(db.Model):
     __tablename__ = 'favorite_starships'
@@ -162,3 +178,4 @@ class FavoriteStarship(db.Model):
             "added_on": self.added_on.isoformat(),
             "starship": self.starship.serialize()
         }
+    
