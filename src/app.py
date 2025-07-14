@@ -146,7 +146,86 @@ def get_favorites(user_id):
     return jsonify(response_body), 200
 
 @app.route('/user/<int:user_id>/favorites/planet/<int:planet_id>', methods=['POST'])
-def add_favorites(user_id, planet_id):
+def add_favorite_planet(user_id, planet_id):
+    
+    user = db.session.get(User, user_id)
+    planet = db.session.get(Planet, planet_id)
+
+    if not user or not planet:
+        return jsonify({"error": "User or Planet not found"}), 404
+
+    new_favorite = FavoritePlanet(user_id=user_id, planet_id=planet_id)
+
+    existing_fav = FavoritePlanet.query.filter_by(user_id=user_id, planet_id=planet_id).first()
+    if existing_fav:
+        return jsonify({"message": "This planet is already in favorites"}), 409
+
+    db.session.add(new_favorite)
+    db.session.commit()
+    
+    response_body = {
+        "message": f"Planet {planet.name} added to user {user.username}'s favorites",
+        "favorite": new_favorite.serialize() 
+    }
+
+    return jsonify(response_body), 201
+
+@app.route('/user/<int:user_id>/favorites/character/<int:character_id>', methods=['POST'])
+def add_favorite_character(user_id, character_id):
+    
+    user = db.session.get(User, user_id)
+    character = db.session.get(Character, character_id)
+
+    if not user or not character:
+        return jsonify({"error": "User or Character not found"}), 404
+
+    new_favorite = FavoriteCharacter(user_id=user_id, character_id=character_id)
+
+    existing_fav = FavoriteCharacter.query.filter_by(user_id=user_id, character_id=character_id).first()
+    if existing_fav:
+        return jsonify({"message": "This character is already in favorites"}), 409
+
+
+    db.session.add(new_favorite)
+    db.session.commit()
+
+    response_body = {
+        "message": f"Character {character.name} added to user {user.username}'s favorites",
+        "favorite": new_favorite.serialize() 
+    }
+
+    return jsonify(response_body), 201
+
+@app.route('/user/<int:user_id>/favorites/starship/<int:starship_id>', methods=['POST'])
+def add_favorite_starship(user_id, starship_id):
+    
+    user = db.session.get(User, user_id)
+    starship = db.session.get(Starship, starship_id)
+
+    if not user or not starship:
+        return jsonify({"error": "User or Starship not found"}), 404
+
+
+    new_favorite = FavoriteStarship(user_id=user_id, starship_id=starship_id)
+
+    existing_fav = FavoriteStarship.query.filter_by(user_id=user_id, starship_id=starship_id).first()
+    if existing_fav:
+        return jsonify({"message": "This starship is already in favorites"}), 409
+
+
+    db.session.add(new_favorite)
+    db.session.commit()
+
+    response_body = {
+        "message": f"Starship {starship.name} added to user {user.username}'s favorites",
+        "favorite": new_favorite.serialize() 
+    }
+
+    return jsonify(response_body), 201
+
+
+@app.route('/user/<int:user_id>/favorites/planet/<int:planet_id>', methods=['DELETE'])
+def remove_favorite_planet(user_id, planet_id):
     
     user = db.session.get(User, user_id)
     planet = db.session.get(Planet, planet_id)
@@ -155,23 +234,77 @@ def add_favorites(user_id, planet_id):
         return jsonify({"error": "User or Planet not found"}), 404
 
 
-    new_favorite = FavoritePlanet(user_id=user_id, planet_id=planet_id)
-
     existing_fav = FavoritePlanet.query.filter_by(user_id=user_id, planet_id=planet_id).first()
-    if existing_fav:
-        return jsonify({"message": "This planet is already in favorites"}), 409
 
-
-    db.session.add(new_favorite)
+    if not existing_fav:
+        return jsonify({"error": "Favorite not found"}), 404
+    
+    favorite_data = existing_fav.serialize()
+   
+    db.session.delete(existing_fav)
     db.session.commit()
-
     
     response_body = {
-        "message": f"Planet {planet.name} added to user {user.username}'s favorites",
-        "favorite": new_favorite.serialize() 
+        "message": f"Planet {planet.name} removed from {user.username}'s favorites",
+        "favorite": favorite_data
     }
 
-    return jsonify(response_body), 201
+    return jsonify(response_body), 200
+
+@app.route('/user/<int:user_id>/favorites/character/<int:character_id>', methods=['DELETE'])
+def remove_favorite_character(user_id, character_id):
+    
+    user = db.session.get(User, user_id)
+    character = db.session.get(Character, character_id)
+
+    if not user or not character:
+        return jsonify({"error": "User or Character not found"}), 404
+
+
+    existing_fav = FavoriteCharacter.query.filter_by(user_id=user_id, character_id=character_id).first()
+
+    if not existing_fav:
+        return jsonify({"error": "Favorite not found"}), 404
+    
+    favorite_data = existing_fav.serialize()
+   
+    db.session.delete(existing_fav)
+    db.session.commit()
+
+    response_body = {
+        "message": f"Character {character.name} removed from {user.username}'s favorites",
+        "favorite": favorite_data
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/user/<int:user_id>/favorites/starship/<int:starship_id>', methods=['DELETE'])
+def remove_favorite_starship(user_id, starship_id):
+    
+    user = db.session.get(User, user_id)
+    starship = db.session.get(Starship, starship_id)
+
+    if not user or not starship:
+        return jsonify({"error": "User or Starship not found"}), 404
+
+
+    existing_fav = FavoriteStarship.query.filter_by(user_id=user_id, starship_id=starship_id).first()
+
+    if not existing_fav:
+        return jsonify({"error": "Favorite not found"}), 404
+    
+    favorite_data = existing_fav.serialize()
+   
+    db.session.delete(existing_fav)
+    db.session.commit()
+    
+    response_body = {
+        "message": f"Starship {starship.name} removed from {user.username}'s favorites",
+        "favorite": favorite_data
+    }
+
+    return jsonify(response_body), 200
+
 
 
 # this only runs if `$ python src/app.py` is executed
