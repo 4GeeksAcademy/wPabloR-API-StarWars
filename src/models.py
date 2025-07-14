@@ -118,6 +118,7 @@ class FavoritePlanet(db.Model):
             "user_id": self.user_id,
             "planet_id": self.planet_id,
             "added_on": self.added_on.isoformat(),
+            "planet": self.planet.serialize()
         }
 
 class FavoriteCharacter(db.Model):
@@ -138,6 +139,7 @@ class FavoriteCharacter(db.Model):
             "user_id": self.user_id,
             "character_id": self.character_id,
             "added_on": self.added_on.isoformat(),
+            "character": self.character.serialize()
         }
 
 class FavoriteStarship(db.Model):
@@ -158,4 +160,5 @@ class FavoriteStarship(db.Model):
             "user_id": self.user_id,
             "starship_id": self.starship_id,
             "added_on": self.added_on.isoformat(),
+            "starship": self.starship.serialize()
         }

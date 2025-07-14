@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Planet, Starship, Character
+from models import db, User, Planet, Starship, Character, FavoritePlanet, FavoriteCharacter, FavoriteStarship
 from sqlalchemy import select
 #from models import Person
 
@@ -130,6 +130,49 @@ def get_character(character_id):
     }
 
     return jsonify(response_body), 200
+
+@app.route('/user/<int:user_id>/favorites', methods=['GET'])
+def get_favorites(user_id):
+    user = db.session.get(User, user_id)
+
+
+    response_body = {
+        "user": user_id,
+        "planets_favs": [f.serialize() for f in user.favorite_planets], 
+        "characters_favs": [f.serialize() for f in user.favorite_characters] , 
+        "starships_favs" : [f.serialize() for f in user.favorite_starships]
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/user/<int:user_id>/favorites/planet/<int:planet_id>', methods=['POST'])
+def add_favorites(user_id, planet_id):
+    
+    user = db.session.get(User, user_id)
+    planet = db.session.get(Planet, planet_id)
+
+    if not user or not planet:
+        return jsonify({"error": "User or Planet not found"}), 404
+
+
+    new_favorite = FavoritePlanet(user_id=user_id, planet_id=planet_id)
+
+    existing_fav = FavoritePlanet.query.filter_by(user_id=user_id, planet_id=planet_id).first()
+    if existing_fav:
+        return jsonify({"message": "This planet is already in favorites"}), 409
+
+
+    db.session.add(new_favorite)
+    db.session.commit()
+
+    
+    response_body = {
+        "message": f"Planet {planet.name} added to user {user.username}'s favorites",
+        "favorite": new_favorite.serialize() 
+    }
+
+    return jsonify(response_body), 201
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
